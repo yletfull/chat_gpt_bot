@@ -25,12 +25,13 @@ const startBot = async () => {
                 return bot.sendMessage(chatId, process.env.START_TEXT);
             }
 
-
             if(!messages[chatId]) {
                 messages[chatId] = [];
             }
             messages[chatId].push({role: "user", content: text});
+
             bot.sendMessage(chatId, 'Ожидай, бот генерирует ответ...');
+
             const completion = await openai.createChatCompletion({
                 model: "gpt-3.5-turbo",
                 messages: messages[chatId],
