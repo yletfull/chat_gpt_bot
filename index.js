@@ -41,8 +41,8 @@ const startBot = async () => {
                     messages: messages[chatId].slice(-20),
                 });
                 const message = `GPT: "${completion.data?.choices[0]?.message?.content}"` || 'Запрос не дошел до чата, попробуй еще разок!'
-                return bot.sendMessage(chatId, message);
-                isBotFetching = false
+                bot.sendMessage(chatId, message);
+                return isBotFetching = false
             } else {
                 bot.sendMessage(chatId, 'Ты уже послал запрос, дождись ответа!');
             }
