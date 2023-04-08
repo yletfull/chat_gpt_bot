@@ -10,11 +10,12 @@ const openai = new OpenAIApi(openAIConfig);
 const bot = new TelegramApi(process.env.TOKEN, {polling: true})
 
 const messages = {};
-let isBotFetching = false;
+let isBotFetching = {};
 
 const startBot = async () => {
     bot.setMyCommands([
         {command: '/start', description: 'Начать общение'},
+        {command: '/debug', description: 'Исправить ошибки'},
     ])
 
     bot.on('message', async msg => {
@@ -26,8 +27,14 @@ const startBot = async () => {
                 return bot.sendMessage(chatId, process.env.START_TEXT);
             }
 
-            if(!isBotFetching) {
-                isBotFetching = true;
+            if (text === '/debug') {
+                messages[chatId] = [];
+                isBotFetching[chatId] = false;
+                return bot.sendMessage(chatId, process.env.DEBUG_TEXT);
+            }
+
+            if(!isBotFetching[chatId]) {
+                isBotFetching[chatId] = true;
 
                 if(!messages[chatId]) {
                     messages[chatId] = [];
@@ -42,7 +49,7 @@ const startBot = async () => {
                 });
                 const message = `GPT: "${completion.data?.choices[0]?.message?.content}"` || 'Запрос не дошел до чата, попробуй еще разок!'
                 bot.sendMessage(chatId, message);
-                return isBotFetching = false
+                return isBotFetching[chatId] = false
             } else {
                 bot.sendMessage(chatId, 'Ты уже послал запрос, дождись ответа!');
             }
