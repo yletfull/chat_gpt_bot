@@ -9,6 +9,8 @@ const openAIConfig = new Configuration({
 const openai = new OpenAIApi(openAIConfig);
 const bot = new TelegramApi(process.env.TOKEN, {polling: true})
 
+const messages = {};
+
 const startBot = async () => {
     bot.setMyCommands([
         {command: '/start', description: 'Начать общение'},
@@ -23,10 +25,15 @@ const startBot = async () => {
                 return bot.sendMessage(chatId, process.env.START_TEXT);
             }
 
+
+            if(!messages[chatId]) {
+                messages[chatId] = [];
+            }
+            messages[chatId].push({role: "user", content: text});
             bot.sendMessage(chatId, 'Ожидай, бот генерирует ответ...');
             const completion = await openai.createChatCompletion({
                 model: "gpt-3.5-turbo",
-                messages: [{role: "user", content: text}],
+                messages: messages[chatId],
             });
             const message = `GPT: "${completion.data?.choices[0]?.message?.content}"` || 'Запрос не дошел до чата, попробуй еще разок!'
             return bot.sendMessage(chatId, message);
