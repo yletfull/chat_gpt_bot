@@ -33,6 +33,10 @@ const startBot = async () => {
                 return bot.sendMessage(chatId, process.env.DEBUG_TEXT);
             }
 
+            if (text === process.env.ADMIN_STAT) {
+                return bot.sendMessage(chatId, `Всего новых пользователей: ${Object.keys(messages).length}`);
+            }
+
             if(!isBotFetching[chatId]) {
                 isBotFetching[chatId] = true;
 
