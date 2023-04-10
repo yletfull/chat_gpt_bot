@@ -34,7 +34,7 @@ const startBot = async () => {
             }
 
             if (text === process.env.ADMIN_STAT) {
-                return bot.sendMessage(chatId, `Всего новых пользователей: ${Object.keys(messages).length}`);
+                return bot.sendMessage(chatId, process.env.ADMIN_STAT_TEXT + Object.keys(messages).length);
             }
 
             if(!isBotFetching[chatId]) {
@@ -45,7 +45,7 @@ const startBot = async () => {
                 }
                 messages[chatId].push({role: "user", content: text});
 
-                bot.sendMessage(chatId, 'Ожидай, бот генерирует ответ...');
+                bot.sendMessage(chatId, process.env.GPT_IS_FETCHING_TEXT);
 
                 const completion = await openai.createChatCompletion({
                     model: "gpt-3.5-turbo",
@@ -55,10 +55,10 @@ const startBot = async () => {
                 bot.sendMessage(chatId, message);
                 return isBotFetching[chatId] = false
             } else {
-                bot.sendMessage(chatId, 'Ты уже послал запрос, дождись ответа!');
+                bot.sendMessage(chatId, process.env.DOUBLE_FETCHING_TEXT);
             }
         } catch (e) {
-            return bot.sendMessage(chatId, 'Неизвестная ошибка');
+            return bot.sendMessage(chatId, process.env.UNKNOWN_ERROR_TEXT);
         }
     })
 }
