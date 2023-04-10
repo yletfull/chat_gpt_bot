@@ -4,8 +4,8 @@ const { stat } = require('./stat');
 const { gpt } = require('./gpt');
 
 module.exports = {
-    start,
-    debug,
-    stat,
-    gpt,
+  start,
+  debug,
+  stat,
+  gpt,
 }
