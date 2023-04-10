@@ -1,6 +1,7 @@
 require('dotenv').config();
 const TelegramApi = require('node-telegram-bot-api')
 const { Configuration, OpenAIApi } = require("openai");
+const { start, debug, stat, gpt } = require("./endpoints");
 
 const openAIConfig = new Configuration({
     apiKey: process.env.GPT_TOKEN,
@@ -11,6 +12,7 @@ const bot = new TelegramApi(process.env.TOKEN, {polling: true})
 
 const messages = {};
 let isBotFetching = {};
+const setBotIsFetching = (chatId, isFetching) => isBotFetching[chatId] = isFetching;
 
 const startBot = async () => {
     bot.setMyCommands([
@@ -23,44 +25,30 @@ const startBot = async () => {
         const chatId = msg.chat.id;
         try {
             if (text === '/start') {
-                await bot.sendSticker(chatId, process.env.START_STICKER_URL)
-                return bot.sendMessage(chatId, process.env.START_TEXT);
+               return start({bot, chatId})
             }
 
             if (text === '/debug') {
-                messages[chatId] = [];
-                isBotFetching[chatId] = false;
-                return bot.sendMessage(chatId, process.env.DEBUG_TEXT);
+               return debug({bot, chatId, messages, setBotIsFetching})
             }
 
             if (text === process.env.ADMIN_STAT) {
-                return bot.sendMessage(chatId, process.env.ADMIN_STAT_TEXT + Object.keys(messages).length);
+                return stat({bot, chatId, messages})
             }
 
-            if(!isBotFetching[chatId]) {
-                isBotFetching[chatId] = true;
-
-                if(!messages[chatId]) {
-                    messages[chatId] = [];
-                }
-                messages[chatId].push({role: "user", content: text});
-
-                bot.sendMessage(chatId, process.env.GPT_IS_FETCHING_TEXT);
-
-                const completion = await openai.createChatCompletion({
-                    model: "gpt-3.5-turbo",
-                    messages: messages[chatId].slice(-20),
-                });
-                const message = `GPT: "${completion.data?.choices[0]?.message?.content}"` || 'Запрос не дошел до чата, попробуй еще разок!'
-                bot.sendMessage(chatId, message);
-                return isBotFetching[chatId] = false
-            } else {
-                bot.sendMessage(chatId, process.env.DOUBLE_FETCHING_TEXT);
-            }
+            return gpt({
+                bot,
+                chatId,
+                messages,
+                isBotFetching,
+                setBotIsFetching,
+                openai,
+                text,
+            })
         } catch (e) {
             return bot.sendMessage(chatId, process.env.UNKNOWN_ERROR_TEXT);
         }
     })
 }
 
-startBot()
+startBot();
