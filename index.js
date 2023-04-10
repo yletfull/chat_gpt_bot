@@ -27,15 +27,12 @@ const startBot = async () => {
             if (text === '/start') {
                return start({bot, chatId})
             }
-
             if (text === '/debug') {
                return debug({bot, chatId, messages, setBotIsFetching})
             }
-
             if (text === process.env.ADMIN_STAT) {
                 return stat({bot, chatId, messages})
             }
-
             return gpt({
                 bot,
                 chatId,
