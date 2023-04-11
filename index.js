@@ -2,6 +2,7 @@ require('dotenv').config();
 const TelegramApi = require('node-telegram-bot-api')
 const { Configuration, OpenAIApi } = require("openai");
 const { start, debug, stat, gpt } = require("./endpoints");
+const sequelize = require('./db');
 
 const openAIConfig = new Configuration({
   apiKey: process.env.GPT_TOKEN,
@@ -10,19 +11,28 @@ const openAIConfig = new Configuration({
 const openai = new OpenAIApi(openAIConfig);
 const bot = new TelegramApi(process.env.TOKEN, {polling: true})
 
+const sessions = {}
+const setSessions = (chatId, value) => sessions[chatId] = value;
 const messages = {};
 let isBotFetching = {};
 const setBotIsFetching = (chatId, isFetching) => isBotFetching[chatId] = isFetching;
 
 const startBot = async () => {
+  try {
+    await sequelize.authenticate()
+    await sequelize.sync()
+  } catch (e) {
+    console.error('Ошибка подключения к бд', e)
+  }
+
   bot.setMyCommands([
     {command: '/start', description: 'Начать общение'},
     {command: '/debug', description: 'Исправить ошибки'},
   ])
 
-  bot.on('message', async msg => {
-    const text = msg.text;
-    const chatId = msg.chat.id;
+  bot.on('message', async (message) => {
+    const text = message.text;
+    const chatId = message.chat.id;
     try {
       if (text === '/start') {
         return start({bot, chatId})
