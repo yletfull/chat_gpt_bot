@@ -1,7 +1,7 @@
 require('dotenv').config();
 const TelegramApi = require('node-telegram-bot-api')
 const { Configuration, OpenAIApi } = require('openai');
-const { start, debug, stat, gpt } = require('./endpoints');
+const { start, debug, stat, gpt, premium } = require('./endpoints');
 const sequelize = require('./db');
 const { bdConnect } = require('./helpers/bdConnect');
 const { UserModel } = require('./models/user')
@@ -25,6 +25,7 @@ const startBot = async () => {
   bot.setMyCommands([
     {command: '/start', description: 'Начать общение'},
     {command: '/debug', description: 'Исправить ошибки'},
+    {command: '/premium', description: 'Премиум, сейчас абсолютно бесплатно'},
   ])
 
   bot.on('message', async (message) => {
@@ -37,6 +38,9 @@ const startBot = async () => {
       }
       if (text === '/debug') {
         return debug({bot, chatId, messages, setBotIsFetching})
+      }
+      if (text === '/premium') {
+        return premium({bot, chatId})
       }
       if (text === process.env.ADMIN_STAT) {
         return stat({bot, chatId, messages})
