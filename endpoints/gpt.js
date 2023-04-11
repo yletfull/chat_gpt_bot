@@ -19,7 +19,7 @@ const substractAvailableMessages = async(user, bot) => {
     await user.update({
       availableMessages: user.dataValues.availableMessages - 1,
     })
-    return bot.sendMessage(user.dataValues.chatId, `У вас осталось ${user.dataValues.availableMessages - 1} сообщений, премиум аккаунт /premium - бесплатно`);
+    return bot.sendMessage(user.dataValues.chatId, `У вас осталось ${user.dataValues.availableMessages - 1} сообщений, получи премиум аккаунт /premium - сейчас абсолютно бесплатно, навсегда`);
   }
 }
 
