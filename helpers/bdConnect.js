@@ -1,6 +1,4 @@
-const sequelize = require("../db");
-
-const bdConnect = async () => {
+const bdConnect = async ({sequelize}) => {
   try {
     await sequelize.authenticate()
     await sequelize.sync()
