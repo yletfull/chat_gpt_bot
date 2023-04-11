@@ -13,7 +13,7 @@ const checkAvailableMessages = (user, bot, setBotIsFetching) => {
 
 const substractAvailableMessages = async(user, bot) => {
   if(user.dataValues.role === 'admin' || user.dataValues.role === 'premium') {
-    return bot.sendMessage(user.dataValues.chatId, `У вас нет лимита на сообщения`);
+    return;
   }
   if(user.dataValues.role === 'default') {
     await user.update({
