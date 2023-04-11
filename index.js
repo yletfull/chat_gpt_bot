@@ -13,8 +13,6 @@ const openAIConfig = new Configuration({
 const openai = new OpenAIApi(openAIConfig);
 const bot = new TelegramApi(process.env.TOKEN, {polling: true})
 
-const sessions = {}
-const setSessions = (chatId, value) => sessions[chatId] = value;
 const messages = {};
 let isBotFetching = {};
 const setBotIsFetching = (chatId, isFetching) => isBotFetching[chatId] = isFetching;
