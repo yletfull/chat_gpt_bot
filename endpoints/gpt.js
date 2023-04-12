@@ -56,14 +56,25 @@ const gpt = async ({ bot, chatId, messages, setBotIsFetching, isBotFetching, ope
 
     bot.sendMessage(chatId, process.env.GPT_IS_FETCHING_TEXT);
 
-    const completion = await openai.createChatCompletion({
-      model: "gpt-3.5-turbo",
-      messages: messages[chatId].slice(-20),
-    });
+    const lastMessage = messages[chatId][messages[chatId].length - 1]?.content;
+    const isImageRequest = lastMessage?.includes('/image');
 
-    const message = `GPT: "${completion.data?.choices[0]?.message?.content}"` || 'Запрос не дошел до чата, попробуй еще разок!'
-
-    bot.sendMessage(chatId, message);
+    if(isImageRequest) {
+      const response = await openai.createImage({
+        prompt: lastMessage,
+        n: 1,
+        size: "1024x1024",
+      });
+      const resultImageUrl = response.data.data[0].url;
+      bot.sendSticker(chatId, resultImageUrl)
+    } else {
+      const completion = await openai.createChatCompletion({
+        model: process.env.GPT_MODEL,
+        messages: messages[chatId].slice(-20),
+      });
+      const resultMessage = `GPT: "${completion.data?.choices[0]?.message?.content}"` || 'Запрос не дошел до чата, попробуй еще разок!'
+      bot.sendMessage(chatId, resultMessage);
+    }
     setBotIsFetching(chatId, false);
     return substractAvailableMessages(user, bot);
   } else if (isBotFetching[chatId]) {
