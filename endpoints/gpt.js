@@ -1,9 +1,10 @@
 const {UserModel} = require("../models/user");
+const {roles} = require("../constants/roles");
 
 const checkAvailableMessages = (user, bot, setBotIsFetching) => {
-  if(user.dataValues.role === 'default') {
+  if(user.dataValues.role === roles.default) {
     if(user.dataValues.availableMessages <= 0) {
-      bot.sendMessage(user.dataValues.chatId, 'У вас закончились сообщения, премиум - без ограничений, навсегда!');
+      bot.sendMessage(user.dataValues.chatId, 'У вас закончились сообщения, сейчас премиум /premium - без ограничений, навсегда!');
       setBotIsFetching(user.dataValues.chatId, false);
       return false;
     }
@@ -12,10 +13,10 @@ const checkAvailableMessages = (user, bot, setBotIsFetching) => {
 }
 
 const substractAvailableMessages = async(user, bot) => {
-  if(user.dataValues.role === 'admin' || user.dataValues.role === 'premium') {
+  if(user.dataValues.role === roles.admin || user.dataValues.role === roles.premium) {
     return;
   }
-  if(user.dataValues.role === 'default') {
+  if(user.dataValues.role === roles.default) {
     await user.update({
       availableMessages: user.dataValues.availableMessages - 1,
     })

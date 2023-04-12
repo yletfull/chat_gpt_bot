@@ -1,10 +1,11 @@
 const sequelize = require('../db');
 const {DataTypes} = require('sequelize')
+const {roles} = require("../constants/roles");
 
 const UserModel = sequelize.define('user', {
   id: {type: DataTypes.INTEGER, primaryKey: true, unique: true, autoIncrement: true},
   chatId: {type: DataTypes.STRING, unique: true},
-  role: {type: DataTypes.STRING, defaultValue: 'default'},
+  role: {type: DataTypes.STRING, defaultValue: roles.default},
   name: {type: DataTypes.STRING, unique: true},
   firstname: {type: DataTypes.STRING},
   lastname: {type: DataTypes.STRING},
