@@ -9,7 +9,8 @@ const UserModel = sequelize.define('user', {
   name: {type: DataTypes.STRING, unique: true},
   firstname: {type: DataTypes.STRING},
   lastname: {type: DataTypes.STRING},
-  availableMessages: {type: DataTypes.INTEGER, defaultValue: 20}
+  availableMessages: {type: DataTypes.INTEGER, defaultValue: 20},
+  updateMessagesDate: {type: DataTypes.STRING, defaultValue: String(new Date())}
 })
 
 module.exports = {

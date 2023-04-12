@@ -2,6 +2,21 @@ const {UserModel} = require("../models/user");
 const {roles} = require("../constants/roles");
 
 const checkAvailableMessages = (user, bot, setBotIsFetching) => {
+  const currentDate = new Date();
+  const userUpdateDate = user.dataValues?.updateMessagesDate;
+
+  if(!userUpdateDate) {
+    const date = currentDate;
+    date.setDate(date.getDate() + Number(process.env.DAYS_UDPATE_MESSAGE || 1))
+    user.update({ updateMessagesDate: String(date)})
+  }
+
+  const isNeedUpdate = new Date(userUpdateDate) < new Date();
+
+  if(isNeedUpdate) {
+    user.update({ updateMessagesDate: '', availableMessages: process.env.DAILY_AVAILABLE_MESSAGES })
+  }
+
   if(user.dataValues.role === roles.default) {
     if(user.dataValues.availableMessages <= 0) {
       bot.sendMessage(user.dataValues.chatId, 'У вас закончились сообщения, сейчас премиум /premium - без ограничений, навсегда!');
@@ -17,10 +32,9 @@ const substractAvailableMessages = async(user, bot) => {
     return;
   }
   if(user.dataValues.role === roles.default) {
-    await user.update({
+    return await user.update({
       availableMessages: user.dataValues.availableMessages - 1,
     })
-    return bot.sendMessage(user.dataValues.chatId, `У вас осталось ${user.dataValues.availableMessages - 1} сообщений, получи премиум аккаунт /premium - сейчас абсолютно бесплатно, навсегда`);
   }
 }
 
