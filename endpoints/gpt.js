@@ -1,20 +1,15 @@
 const {UserModel} = require("../models/user");
 const {roles} = require("../constants/roles");
+const dayjs = require("dayjs");
 
-const checkAvailableMessages = (user, bot, setBotIsFetching) => {
-  const currentDate = new Date();
-  const userUpdateDate = user.dataValues?.updateMessagesDate;
-
-  if(!userUpdateDate) {
-    const date = currentDate;
-    date.setDate(date.getDate() + Number(process.env.DAYS_UDPATE_MESSAGE || 1))
-    user.update({ updateMessagesDate: String(date)})
-  }
-
-  const isNeedUpdate = new Date(userUpdateDate) < new Date();
+const checkAvailableMessages = async(user, bot, setBotIsFetching = () => {}) => {
+  const currentDate = dayjs();
+  const userUpdateDate = dayjs(user.dataValues?.updateMessagesDate);
+  const isNeedUpdate = !userUpdateDate || dayjs(currentDate).diff(userUpdateDate) > 0;
 
   if(isNeedUpdate) {
-    user.update({ updateMessagesDate: '', availableMessages: process.env.DAILY_AVAILABLE_MESSAGES })
+    const updateDate = dayjs(currentDate).add(process.env.DAYS_UDPATE_MESSAGE || 1, 'day').toDate();
+    await user.update({ updateMessagesDate: String(updateDate), availableMessages: process.env.DAILY_AVAILABLE_MESSAGES})
   }
 
   if(user.dataValues.role === roles.default) {
@@ -43,7 +38,7 @@ const gpt = async ({ bot, chatId, messages, setBotIsFetching, isBotFetching, ope
     where: { chatId: String(chatId) }
   })
 
-  const hasAvailableMessages = checkAvailableMessages(user, bot, setBotIsFetching);
+  const hasAvailableMessages = await checkAvailableMessages(user, bot, setBotIsFetching);
 
   if(!isBotFetching[chatId] && hasAvailableMessages) {
     setBotIsFetching(chatId, true);
@@ -84,4 +79,5 @@ const gpt = async ({ bot, chatId, messages, setBotIsFetching, isBotFetching, ope
 
 module.exports = {
   gpt,
+  checkAvailableMessages,
 }

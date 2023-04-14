@@ -1,6 +1,7 @@
 const sequelize = require('../db');
 const {DataTypes} = require('sequelize')
 const {roles} = require("../constants/roles");
+const dayjs = require("dayjs");
 
 const UserModel = sequelize.define('user', {
   id: {type: DataTypes.INTEGER, primaryKey: true, unique: true, autoIncrement: true},
@@ -10,7 +11,7 @@ const UserModel = sequelize.define('user', {
   firstname: {type: DataTypes.STRING},
   lastname: {type: DataTypes.STRING},
   availableMessages: {type: DataTypes.INTEGER, defaultValue: 20},
-  updateMessagesDate: {type: DataTypes.STRING, defaultValue: String(new Date())}
+  updateMessagesDate: {type: DataTypes.STRING, defaultValue: String(dayjs().toDate())}
 })
 
 module.exports = {
