@@ -3,6 +3,7 @@ const { debug } = require('./debug');
 const { stat } = require('./stat');
 const { gpt } = require('./gpt');
 const { premium } = require('./premium');
+const { info } = require('./info');
 
 module.exports = {
   start,
@@ -10,4 +11,5 @@ module.exports = {
   stat,
   gpt,
   premium,
+  info,
 }
