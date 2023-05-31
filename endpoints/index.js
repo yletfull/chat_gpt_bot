@@ -4,6 +4,7 @@ const { stat } = require('./stat');
 const { gpt } = require('./gpt');
 const { premium } = require('./premium');
 const { info } = require('./info');
+const { xls, unXls, xlsLoader } = require('./xls');
 
 module.exports = {
   start,
@@ -12,4 +13,7 @@ module.exports = {
   gpt,
   premium,
   info,
+  xls,
+  xlsLoader,
+  unXls,
 }
